@@ -1,14 +1,22 @@
 import passport from 'passport';
 import {Strategy as JwtStrategy} from 'passport-jwt';
+import GooglePlusTokenStrategy from 'passport-google-plus-token';
 import {ExtractJwt} from 'passport-jwt';
 import {Strategy as LocalStrategy} from 'passport-local';
-import {JWT_HEADER, JWT_SECRET} from './config';
+import FacebookTokenStrategy from 'passport-facebook-token';
+import {
+  local,
+  oauth
+} from './config';
 import User from './models/userModel';
+import configureStore from "../client/src/store";
+
+const {facebook, google} = oauth;
 
 // JSON WEB TOKENS
 passport.use(new JwtStrategy({
-  jwtFromRequest: ExtractJwt.fromHeader(JWT_HEADER),
-  secretOrKey: JWT_SECRET
+  jwtFromRequest: ExtractJwt.fromHeader(local.JWT_HEADER),
+  secretOrKey: local.JWT_SECRET
 }, async (payload, done) => {
   try {
     // Find the user specified in token
@@ -21,8 +29,52 @@ passport.use(new JwtStrategy({
 
     // Otherwise, return the user
     done(null, user);
-  } catch(error) {
+  } catch (error) {
     done(error, false);
+  }
+}));
+
+// GOOGLE OAUTH STRATEGY
+passport.use(google.AUTH_TOKEN, new GooglePlusTokenStrategy({
+  clientID: google.CLIENT_ID,
+  clientSecret: google.CLIENT_SECRET
+}, async (accessToken, refreshToken, profile, done) => {
+  try {
+    const existingUser = await User.findOne({"google.id": profile.id});
+    if (existingUser) {
+      console.log("User already exists in our Database");
+      return done(null, existingUser);
+    }
+
+    console.log("User doesn't exist in our Database, creating new entry");
+
+    const newUser = new User({
+
+      method: google.AUTH_TAG,
+      [google.AUTH_TAG]: {
+        id: profile.id,
+        email: profile.emails[0].value,
+      }
+    });
+
+    await newUser.save();
+    done(null, newUser);
+  } catch(e) {
+    done(e, false, e.message)
+  }
+
+}));
+
+passport.use('facebookToken', new FacebookTokenStrategy({
+  clientID: facebook.CLIENT_ID,
+  clientSecret: facebook.CLIENT_SECRET,
+}, async (accessToken, refreshToken, profile, done) => {
+  try {
+    console.log('profile', profile);
+    console.log('accesstokent', accessToken);
+    console.log('refreshtoken', refreshToken);
+  } catch (e) {
+    done(e, false, e.message)
   }
 }));
 
@@ -32,15 +84,15 @@ passport.use(new LocalStrategy({
 }, async (email, password, done) => {
 
   try {
-    const user = await User.findOne({email});
+    const user = await User.findOne({"local.email": email});
 
-    if(!user) {
+    if (!user) {
       return done(null, false);
     }
 
     const isMatch = await user.isValidPassword(password);
 
-    if(!isMatch) {
+    if (!isMatch) {
       return done(null, false);
     }
 
