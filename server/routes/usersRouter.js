@@ -6,8 +6,6 @@ import passport from 'passport';
 // noinspection JSUnusedLocalSymbols
 const passportConf = require('../passport');
 const router = promiseRouter();
-const passportSingIn = passport.authenticate('local', {session: false});
-const passportJWT = passport.authenticate('jwt', {session: false});
 
 const noSession = {session: false};
 const passportLocal = passport.authenticate('local', noSession);
