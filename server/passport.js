@@ -3,20 +3,20 @@ import {Strategy as JwtStrategy} from 'passport-jwt';
 import GooglePlusTokenStrategy from 'passport-google-plus-token';
 import {ExtractJwt} from 'passport-jwt';
 import {Strategy as LocalStrategy} from 'passport-local';
+import FacebookTokenStrategy from 'passport-facebook-token';
 import {
-  JWT_HEADER,
-  JWT_SECRET,
-  GOOGLE_CLIENT_ID,
-  GOOGLE_CLIENT_SECRET,
-  AUTH_GOOGLE_TOKEN,
-  AUTH_GOOGLE
+  local,
+  oauth
 } from './config';
 import User from './models/userModel';
+import configureStore from "../client/src/store";
+
+const {facebook, google} = oauth;
 
 // JSON WEB TOKENS
 passport.use(new JwtStrategy({
-  jwtFromRequest: ExtractJwt.fromHeader(JWT_HEADER),
-  secretOrKey: JWT_SECRET
+  jwtFromRequest: ExtractJwt.fromHeader(local.JWT_HEADER),
+  secretOrKey: local.JWT_SECRET
 }, async (payload, done) => {
   try {
     // Find the user specified in token
@@ -35,9 +35,9 @@ passport.use(new JwtStrategy({
 }));
 
 // GOOGLE OAUTH STRATEGY
-passport.use(AUTH_GOOGLE_TOKEN, new GooglePlusTokenStrategy({
-  clientID: GOOGLE_CLIENT_ID,
-  clientSecret: GOOGLE_CLIENT_SECRET
+passport.use(google.AUTH_TOKEN, new GooglePlusTokenStrategy({
+  clientID: google.CLIENT_ID,
+  clientSecret: google.CLIENT_SECRET
 }, async (accessToken, refreshToken, profile, done) => {
   try {
     const existingUser = await User.findOne({"google.id": profile.id});
@@ -50,8 +50,8 @@ passport.use(AUTH_GOOGLE_TOKEN, new GooglePlusTokenStrategy({
 
     const newUser = new User({
 
-      method: AUTH_GOOGLE,
-      [AUTH_GOOGLE]: {
+      method: google.AUTH_TAG,
+      [google.AUTH_TAG]: {
         id: profile.id,
         email: profile.emails[0].value,
       }
@@ -65,13 +65,26 @@ passport.use(AUTH_GOOGLE_TOKEN, new GooglePlusTokenStrategy({
 
 }));
 
+passport.use('facebookToken', new FacebookTokenStrategy({
+  clientID: facebook.CLIENT_ID,
+  clientSecret: facebook.CLIENT_SECRET,
+}, async (accessToken, refreshToken, profile, done) => {
+  try {
+    console.log('profile', profile);
+    console.log('accesstokent', accessToken);
+    console.log('refreshtoken', refreshToken);
+  } catch (e) {
+    done(e, false, e.message)
+  }
+}));
+
 // LOCAL STRATEGY
 passport.use(new LocalStrategy({
   usernameField: 'email'
 }, async (email, password, done) => {
 
   try {
-    const user = await User.findOne({email});
+    const user = await User.findOne({"local.email": email});
 
     if (!user) {
       return done(null, false);

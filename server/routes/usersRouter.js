@@ -6,20 +6,27 @@ import passport from 'passport';
 const passportConf = require('../passport');
 const router = promiseRouter();
 
-const noSession = {session: false}
+const noSession = {session: false};
+const passportLocal = passport.authenticate('local', noSession);
+const passportJWT = passport.authenticate('jwt', noSession);
+const passportGoogle = passport.authenticate('googleToken', noSession);
 
 
 router.route('/signup')
   .post(validateBody(schemas.authSchema), usersController.signUp);
 
 router.route('/signin')
-  .post(validateBody(schemas.authSchema), passport.authenticate('local', noSession), usersController.signIn);
+  .post(validateBody(schemas.authSchema), passportLocal, usersController.signIn);
+
+
+router.route('/oauth/facebook')
+  .post(passport.authenticate('facebookToken', noSession), usersController.facebookOAuth)
 
 router.route('/oauth/google')
-  .post(passport.authenticate('googleToken', noSession), usersController.googleOAuth);
+  .post(passportGoogle, usersController.googleOAuth);
 
 router.route('/secret')
-  .get(passport.authenticate('jwt', noSession), usersController.secret);
+  .get(passportJWT, usersController.secret);
 
 module.exports = {
   router
