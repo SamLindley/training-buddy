@@ -1,9 +1,12 @@
 import React from 'react';
+import MainScreenContainer from "../components/mainScreen/mainScreenContainer";
+import SubScreensContainer from "../components/subScreens/subScreensContainer";
 
 
 const MainContentContainer = () => {
   return <div style={style}>
-
+    <MainScreenContainer/>
+    <SubScreensContainer/>
   </div>
 };
 

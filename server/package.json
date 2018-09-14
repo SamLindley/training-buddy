@@ -4,7 +4,7 @@
   "description": "Training Buddy server",
   "main": "app.js",
   "scripts": {
-    "start:dev": "nodemon app.js --exec babel-node --presets babel-preset-env"
+    "start:dev": "nodemon app-server.js --exec babel-node --presets babel-preset-env"
   },
   "author": "",
   "license": "ISC",

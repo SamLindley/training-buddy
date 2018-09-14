@@ -1,35 +1,27 @@
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
+import {connect} from 'react-redux';
 import FacebookLogin from 'react-facebook-login/dist/facebook-login-render-props';
+import {loginViaFacebook} from "../../../redux/actions/AuthActions";
 
 const Facebook = props => {
 
-
-  const componentClicked = () => {
-    console.log("Clicked")
-  };
-
   const responseFacebook = response => {
-    console.log("RUNNOSNFSOIDFN");
-    console.log(response);
+    props.loginViaFacebook(response);
   };
-
 
   let fbContent;
-
 
   fbContent = (
     <FacebookLogin
       appId="631676327228873"
       fields="name,email,picture"
       callback={responseFacebook}
-      onClick={componentClicked}
       render={renderProps => {
         return <button onClick={renderProps.onClick}>Login with Facebook</button>
       }}
     />
   );
-
 
   return (
     <div>
@@ -41,7 +33,7 @@ const Facebook = props => {
 
 Facebook.propTypes = {};
 
-export default Facebook;
+export default connect(null, {loginViaFacebook})(Facebook);
 
 
 

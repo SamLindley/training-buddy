@@ -8,17 +8,17 @@ import cors from 'cors';
 mongoose.Promise = global.Promise;
 mongoose.connect('mongodb://localhost/TrainingBuddy');
 
-const app = express();
+const appServer = express();
 
 //Middlewares
-app.use(morgan(`dev`));
-app.use(bodyParser.json());
-app.use(cors());
+appServer.use(morgan(`dev`));
+appServer.use(bodyParser.json());
+appServer.use(cors());
 
 //Routes
-app.use('/users', router);
+appServer.use('/users', router);
 
 //Start the server
 const port = process.env.PORT || 3030;
-app.listen(port);
+appServer.listen(port);
 console.log(`Server listening @ ${port}`);

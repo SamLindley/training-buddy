@@ -15,7 +15,7 @@ class HeaderLogInContainer extends Component {
         <Facebook/>
         <Google/>
       </div>
-    ) : <div>Welcome {this.props.user}</div>
+    ) : <div>Welcome <span style={{color: "#f58549"}}>{this.props.user}</span></div>
 
   }
 }

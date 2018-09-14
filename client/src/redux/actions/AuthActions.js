@@ -3,6 +3,13 @@ import * as types from '../types';
 
 export const loginViaFacebook = response => async dispatch => {
   console.log(response);
+
+  const res = await axios.post("http://localhost:3030/users/oauth/facebook", {access_token: response.accessToken});
+  if (res.status === 200) {
+    dispatch({type: types.LOGIN_SUCCESS, payload: {userName: res.data.userName}})
+  } else {
+    dispatch({type: types.FACEBOOK_LOGIN_FAILURE, payload: res})
+  }
 };
 
 export const loginViaGoogle = response => async dispatch => {

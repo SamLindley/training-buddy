@@ -9,7 +9,6 @@ import {
   oauth
 } from './config';
 import User from './models/userModel';
-import configureStore from "../client/src/store";
 
 const {facebook, google} = oauth;
 
@@ -82,7 +81,8 @@ passport.use('facebookToken', new FacebookTokenStrategy({
       method: facebook.AUTH_TAG,
       [facebook.AUTH_TAG]: {
         id: profile.id,
-        email: profile.emails[0].value
+        email: profile.emails[0].value,
+        name: profile.name.givenName,
       }
     });
 

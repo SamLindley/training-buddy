@@ -4,7 +4,7 @@ import { local } from '../config';
 
 const signToken = user => {
   return JWT.sign({
-    iss: 'CodeWorkr',
+    iss: 'TrainingBuddy',
     sub: user.id,
     iat: new Date().getTime(), // current time
     exp: new Date().setDate(new Date().getDate() + 1) // current time + 1 day ahead
@@ -49,7 +49,7 @@ module.exports = {
   facebookOAuth: async(req, res, next) => {
 
     const token = signToken(req.user);
-    res.status(200).json({token});
+    res.status(200).json({token, userName: req.user.facebook.name});
   },
 
   secret: async (req, res, next) => {
