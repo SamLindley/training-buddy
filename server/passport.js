@@ -48,13 +48,16 @@ passport.use(google.AUTH_TOKEN, new GooglePlusTokenStrategy({
 
     console.log("User doesn't exist in our Database, creating new entry");
 
+    console.log(profile);
     const newUser = new User({
 
       method: google.AUTH_TAG,
       [google.AUTH_TAG]: {
         id: profile.id,
         email: profile.emails[0].value,
-      }
+        givenName: profile.name.givenName,
+      },
+
     });
 
     await newUser.save();
@@ -70,9 +73,22 @@ passport.use('facebookToken', new FacebookTokenStrategy({
   clientSecret: facebook.CLIENT_SECRET,
 }, async (accessToken, refreshToken, profile, done) => {
   try {
-    console.log('profile', profile);
-    console.log('accesstokent', accessToken);
-    console.log('refreshtoken', refreshToken);
+    const existingUser = await User.findOne({"facebook.id": profile.id})
+    if (existingUser) {
+      return done(null, existingUser);
+    }
+
+    const newUser = new User({
+      method: facebook.AUTH_TAG,
+      [facebook.AUTH_TAG]: {
+        id: profile.id,
+        email: profile.emails[0].value
+      }
+    });
+
+    await newUser.save();
+    done(null, newUser);
+
   } catch (e) {
     done(e, false, e.message)
   }

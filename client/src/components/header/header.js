@@ -1,35 +1,25 @@
 import React, {Component} from 'react';
 import HeaderLogo from './headerLogo';
+import HeaderLogInContainer from "./headerLogInContainer";
 
-class Header extends Component {
+const Header = props => {
 
-  handleLogIn = () => {
-    this.setState({
-      isLoggedIn: true
-    })
-  };
 
-  handleLogOut = () => {
-    this.setState({
-      isLoggedIn: false
-    })
-  };
+  return (
+    <div style={style}>
+      <HeaderLogo title={'Training Buddy'}/>
+      <HeaderLogInContainer/>
+    </div>
+  )
 
-  render() {
-    return (
-      <div style={style}>
-        <HeaderLogo title={'Training Buddy'}/>
-      </div>
-    )
-  }
-}
+};
 
 const style = {
   fontFamily: 'lobster',
   color: 'white',
   fontSize: "6rem",
   display: 'flex',
-
+  justifyContent: 'space-between'
 };
 
 export default Header;

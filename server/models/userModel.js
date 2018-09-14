@@ -1,19 +1,17 @@
 import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
-import {AUTH_LOCAL, AUTH_FACEBOOK, AUTH_GOOGLE} from '../config';
 
 const Schema = mongoose.Schema;
 
 const userSchema = new Schema({
   method: {
     type: String,
-    enum: [AUTH_LOCAL, AUTH_FACEBOOK, AUTH_GOOGLE],
+    enum: ['local', 'facebook', 'google'],
     required: true
   },
   local: {
     email: {
       type: String,
-      unique: true,
       lowercase: true,
     },
     password: {
@@ -27,7 +25,9 @@ const userSchema = new Schema({
     email: {
       type: String,
       lowercase: true,
-    }
+    },
+    givenName: String,
+    name: String,
   },
   facebook: {
     id: {
@@ -36,14 +36,16 @@ const userSchema = new Schema({
     email: {
       type: String,
       lowercase: true,
-    }
+    },
+    givenName: String,
+    name: String,
   },
 
 });
 
 userSchema.pre('save', async function (next) {
   try {
-    if(this.method !== AUTH_LOCAL){
+    if(this.method !== 'local'){
       next();
     }
 
@@ -52,6 +54,7 @@ userSchema.pre('save', async function (next) {
     this.local.password = await bcrypt.hash(this.local.password, salt);
     next();
   } catch (e) {
+    console.log("CAUGTH");
     next(e);
   }
 });
