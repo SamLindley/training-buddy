@@ -14,7 +14,7 @@ class MainScreenContainer extends Component {
 const style = {
   background: "#ccc",
   color: "white",
-  minWidth: "60%"
+  minWidth: "70%"
 };
 
 MainScreenContainer.propTypes = {};
